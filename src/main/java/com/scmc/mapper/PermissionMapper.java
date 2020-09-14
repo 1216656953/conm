@@ -1,6 +1,6 @@
 package com.scmc.mapper;
 
-import com.scmc.entity.User;
+import com.scmc.entity.Permission;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
@@ -11,6 +11,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @author liming
  * @since 2020-09-14
  */
-public interface UserMapper extends BaseMapper<User> {
+public interface PermissionMapper extends BaseMapper<Permission> {
 
 }

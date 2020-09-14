@@ -1,57 +1,84 @@
 package com.scmc.entity;
 
-import lombok.Data;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import java.time.LocalDateTime;
+import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
-@Data
-public class User implements Serializable, UserDetails, GrantedAuthority {
-    private Long id;
+/**
+ * <p>
+ * 
+ * </p>
+ *
+ * @author liming
+ * @since 2020-09-14
+ */
+@TableName("user")
+public class User implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @TableId(value = "id", type = IdType.AUTO)
+    private Integer id;
+
+    @TableField("username")
     private String username;
+
+    @TableField("password")
     private String password;
-    private String role;
-    private String sex;
-    private String email;
 
-    @Override
-    public String getAuthority() {
-        return role;
+    @TableField("salt")
+    private Integer salt;
+
+    @TableField("create_time")
+    private LocalDateTime createTime;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+    public Integer getSalt() {
+        return salt;
+    }
+
+    public void setSalt(Integer salt) {
+        this.salt = salt;
+    }
+    public LocalDateTime getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(LocalDateTime createTime) {
+        this.createTime = createTime;
     }
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        //  需将 List<Authority> 转成 List<SimpleGrantedAuthority>，否则前端拿不到角色列表名称
-        List<SimpleGrantedAuthority> simpleAuthorities = new ArrayList<>();
-        String [] roles=this.getAuthority().split(",");
-        for (String role:roles) {
-            simpleAuthorities.add(new SimpleGrantedAuthority(role));
-        }
-        return simpleAuthorities;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
+    public String toString() {
+        return "User{" +
+            "id=" + id +
+            ", username=" + username +
+            ", password=" + password +
+            ", salt=" + salt +
+            ", createTime=" + createTime +
+        "}";
     }
 }
