@@ -2,6 +2,7 @@ package com.scmc.generator;
 
 import com.baomidou.mybatisplus.generator.AutoGenerator;
 import com.baomidou.mybatisplus.generator.config.*;
+import com.baomidou.mybatisplus.generator.config.rules.DateType;
 import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
 import com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine;
 
@@ -13,7 +14,7 @@ public class MyBatisPlusGenerater {
     static String sqlPort = "3306"; // 数据库名
     static String sqlUser = "root";
     static String sqlPassword = "root";
-    static String table = "user,role,permission,user_role,role_permission"; // 表，用逗号隔开
+    static String table = "user_role,role_permission"; // 表，用逗号隔开
 
     public static void main(String[] args) {
         // 代码生成器
@@ -25,6 +26,7 @@ public class MyBatisPlusGenerater {
         gc.setAuthor(author);
         gc.setOpen(false);
         gc.setServiceName("%sService");
+        gc.setDateType(DateType.ONLY_DATE);
         mpg.setGlobalConfig(gc);
 
         // 数据源配置

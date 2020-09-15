@@ -3,9 +3,12 @@ package com.scmc.entity;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * <p>
@@ -33,7 +36,7 @@ public class User implements Serializable {
     private Integer salt;
 
     @TableField("create_time")
-    private LocalDateTime createTime;
+    private Date createTime;
 
     public Integer getId() {
         return id;
@@ -63,11 +66,11 @@ public class User implements Serializable {
     public void setSalt(Integer salt) {
         this.salt = salt;
     }
-    public LocalDateTime getCreateTime() {
+    public Date getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(LocalDateTime createTime) {
+    public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
 
