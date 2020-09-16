@@ -3,7 +3,9 @@ package com.scmc.mapper;
 import com.scmc.entity.Role;
 import com.scmc.entity.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import org.springframework.stereotype.Component;
 
 import java.util.Set;
 
@@ -15,6 +17,7 @@ import java.util.Set;
  * @author liming
  * @since 2020-09-14
  */
+@Component
 public interface UserMapper extends BaseMapper<User> {
 
     public Set<Role> getRolesByUserId(Long userid);
