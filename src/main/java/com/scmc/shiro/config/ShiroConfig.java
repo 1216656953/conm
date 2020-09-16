@@ -1,9 +1,11 @@
 package com.scmc.shiro.config;
 
+import com.sun.istack.internal.NotNull;
 import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.session.mgt.DefaultSessionKey;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.springframework.boot.SpringBootConfiguration;
@@ -20,9 +22,9 @@ public class ShiroConfig {
     @Bean
     public ShiroFilterFactoryBean shiroFilterFactoryBean(SecurityManager securityManager) {
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
-        shiroFilterFactoryBean.setLoginUrl("/main/toLogin");
-        shiroFilterFactoryBean.setSuccessUrl("/main/index");
-        shiroFilterFactoryBean.setUnauthorizedUrl("/main/unAuth");
+        shiroFilterFactoryBean.setLoginUrl("/pub/toLogin");
+        shiroFilterFactoryBean.setSuccessUrl("/authc/index");
+        shiroFilterFactoryBean.setUnauthorizedUrl("/pub/unAuth");
         shiroFilterFactoryBean.setSecurityManager(securityManager);
         shiroFilterFactoryBean.setFilterChainDefinitionMap(getFilterChainMap());
         return shiroFilterFactoryBean;
@@ -54,7 +56,9 @@ public class ShiroConfig {
 
     @Bean
     public SessionManager sessionManager() {
-        return new CustomSessionManager();
+        CustomSessionManager sessionManager = new CustomSessionManager();
+        sessionManager.setGlobalSessionTimeout(600000L);
+        return sessionManager;
     }
 
     private Map<String, String> getFilterChainMap() {
