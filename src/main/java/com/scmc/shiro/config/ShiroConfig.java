@@ -5,13 +5,21 @@ import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.session.mgt.SessionManager;
+import org.apache.shiro.spring.LifecycleBeanPostProcessor;
+import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.crazycake.shiro.RedisCacheManager;
+import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Properties;
 
 /***
  * shiro配置类
@@ -36,7 +44,7 @@ public class ShiroConfig {
         DefaultWebSecurityManager manager = new DefaultWebSecurityManager();
         manager.setRealm(customerRealm());
         manager.setSessionManager(sessionManager());
-        //manager.setCacheManager(redisCacheManager());
+       // manager.setCacheManager(redisCacheManager());
         return manager;
     }
 
@@ -64,11 +72,30 @@ public class ShiroConfig {
     }
 
     @Bean
-    public CacheManager redisCacheManager(){
+    public RedisCacheManager redisCacheManager(){
         RedisCacheManager cacheManager = new RedisCacheManager();
         cacheManager.setExpire(30*60*1000);
         return cacheManager;
     }
+
+    /**
+     * 开启shiro 注解模式
+     * 可以在controller中的方法前加上注解
+     * 如 @RequiresPermissions("userInfo:add")
+     * @return
+     */
+   /* @Bean
+    public  LifecycleBeanPostProcessor lifecycleBeanPostProcessor() {
+        return new LifecycleBeanPostProcessor();
+    }
+
+    @Bean
+    @DependsOn("lifecycleBeanPostProcessor")
+    public  AuthorizationAttributeSourceAdvisor getDefaultAdvisorAutoProxyCreator(){
+        AuthorizationAttributeSourceAdvisor proxyCreator = new AuthorizationAttributeSourceAdvisor();
+        proxyCreator.setSecurityManager(securityManager());
+        return proxyCreator;
+    }*/
 
     private Map<String, String> getFilterChainMap() {
         Map<String, String> map = new LinkedHashMap<>();

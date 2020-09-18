@@ -9,9 +9,10 @@ public class JsonData {
     private String url;
     private String token;
     private String msg;
-    public JsonData(Boolean success,String url,String token){
+    public JsonData(Boolean success,String url,String token,String msg){
         this.success=success;
         this.url=url;
         this.token=token;
+        this.msg=msg;
     }
 }

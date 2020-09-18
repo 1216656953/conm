@@ -10,8 +10,10 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.cache.Cache;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.crazycake.shiro.RedisCacheManager;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashSet;
@@ -35,6 +37,7 @@ public class CustomerRealm extends AuthorizingRealm {
         permissions.add("conm:delete");
         Set<String> roles = new HashSet<>();
         roles.add("user");
+        System.out.println("权限user");
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
         info.setStringPermissions(permissions);
         info.setRoles(roles);
