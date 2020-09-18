@@ -22,6 +22,7 @@ public class ShiroConfig {
     @Bean
     public ShiroFilterFactoryBean shiroFilterFactoryBean(SecurityManager securityManager) {
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
+        //认证失败的时候会以get方式跳转到这个LoginUrl路径，所以这个路径必须是get方式
         shiroFilterFactoryBean.setLoginUrl("/pub/login");
         shiroFilterFactoryBean.setSuccessUrl("/authc/success");
         shiroFilterFactoryBean.setUnauthorizedUrl("/pub/unAuth");
@@ -35,7 +36,7 @@ public class ShiroConfig {
         DefaultWebSecurityManager manager = new DefaultWebSecurityManager();
         manager.setRealm(customerRealm());
         manager.setSessionManager(sessionManager());
-        manager.setCacheManager(redisCacheManager());
+        //manager.setCacheManager(redisCacheManager());
         return manager;
     }
 

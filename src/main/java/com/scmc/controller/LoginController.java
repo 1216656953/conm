@@ -35,6 +35,7 @@ public class LoginController {
     @GetMapping("login")
     @ResponseBody
     public String login() {
+        //告诉前端，认证失败，需要登录
         JsonData jsonData = new JsonData(false, "/pub/toLogin",null);
         return JSONObject.toJSONString(jsonData);
     }
