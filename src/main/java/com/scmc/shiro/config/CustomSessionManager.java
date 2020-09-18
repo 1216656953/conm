@@ -26,6 +26,7 @@ public class CustomSessionManager extends DefaultWebSessionManager {
     @Override
     protected Serializable getSessionId(ServletRequest request, ServletResponse response) {
         String sessionId = WebUtils.toHttp(request).getHeader("token");
+        System.out.println("sessionid="+sessionId);
         //第一次请求没有携带sessionId,那么就分配一个
         if (sessionId != null) {
         request.setAttribute(ShiroHttpServletRequest.REFERENCED_SESSION_ID_SOURCE,ShiroHttpServletRequest.COOKIE_SESSION_ID_SOURCE);

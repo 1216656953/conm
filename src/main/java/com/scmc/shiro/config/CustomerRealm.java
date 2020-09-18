@@ -51,15 +51,15 @@ public class CustomerRealm extends AuthorizingRealm {
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
         //自己查询数据库，查询这个username的密码
-        Object username = authenticationToken.getPrincipal();
-        String pwd = "";
-        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        String username = authenticationToken.getPrincipal().toString();
+        String pwd = "1234";
+        /*QueryWrapper<User> wrapper = new QueryWrapper<>();
         wrapper.eq("username", username);
         User user = userMapper.selectOne(wrapper);
         if (user == null|| StringUtils.isEmpty(user.getPassword())) {
            return null;
         }
-        pwd = user.getPassword();
+        pwd = user.getPassword();*/
         SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(username, pwd, this.getName());
         return info;
     }

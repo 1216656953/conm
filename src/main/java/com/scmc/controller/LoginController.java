@@ -1,29 +1,47 @@
 package com.scmc.controller;
 
+import com.alibaba.fastjson.JSONObject;
+import com.scmc.entity.JsonData;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.subject.Subject;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import sun.security.krb5.internal.CredentialsUtil;
 
-@Controller("/main")
+import java.io.Serializable;
+
+@Controller
+@RequestMapping("pub")
 public class LoginController {
 
-    @PostMapping("/login")
+    @PostMapping("toLogin")
     @ResponseBody
-    public String login(String username, String password) {
-
-        return "localhost:8089";
+    public String toLogin(@RequestParam("username") String username,@RequestParam("password") String password) {
+        try{
+            Subject subject = SecurityUtils.getSubject();
+            UsernamePasswordToken token = new UsernamePasswordToken(username,password);
+            subject.login(token);
+            subject.isAuthenticated();
+            String id = subject.getSession().getId().toString();
+            JsonData jsonData = new JsonData(true, "/authc/index", id);
+            return JSONObject.toJSONString(jsonData);
+        }catch(Exception e){
+            JsonData jsonData = new JsonData(false, "/pub/unauthc",null);
+            return JSONObject.toJSONString(jsonData);
+        }
+    }
+    @GetMapping("login")
+    @ResponseBody
+    public String login() {
+        JsonData jsonData = new JsonData(false, "/pub/toLogin",null);
+        return JSONObject.toJSONString(jsonData);
     }
 
-    @PostMapping("/toLogin")
+    @PostMapping("unauthc")
     @ResponseBody
-    public String loginPage() {
-        System.out.print("姓名");
-        return "";
-    }
-
-    @PostMapping("/upload")
-    @ResponseBody
-    public void uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("sign") String sign) {
-        System.out.print(file.getName());
+    public String uploadFile() {
+       return "登录失败";
     }
 }

@@ -20,5 +20,4 @@ import java.util.Set;
 @Component
 public interface UserMapper extends BaseMapper<User> {
 
-    public Set<Role> getRolesByUserId(Long userid);
 }
