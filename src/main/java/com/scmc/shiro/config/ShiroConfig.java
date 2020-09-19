@@ -2,24 +2,19 @@ package com.scmc.shiro.config;
 
 import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
-import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.session.mgt.SessionManager;
-import org.apache.shiro.spring.LifecycleBeanPostProcessor;
-import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
+import org.apache.shiro.session.mgt.eis.SessionDAO;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.crazycake.shiro.RedisCacheManager;
-import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.crazycake.shiro.RedisManager;
+import org.crazycake.shiro.RedisSessionDAO;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Properties;
 
 /***
  * shiro配置类
@@ -42,15 +37,16 @@ public class ShiroConfig {
     @Bean
     public SecurityManager securityManager() {
         DefaultWebSecurityManager manager = new DefaultWebSecurityManager();
-        manager.setRealm(customerRealm());
+        manager.setRealm(customRealm());
         manager.setSessionManager(sessionManager());
-       // manager.setCacheManager(redisCacheManager());
+        manager.setCacheManager(redisCacheManager());
         return manager;
     }
 
     @Bean
-    public CustomerRealm customerRealm() {
-        CustomerRealm realm = new CustomerRealm();
+    public CustomRealm customRealm() {
+        CustomRealm realm = new CustomRealm();
+        realm.setCacheManager(redisCacheManager());
         //realm.setCredentialsMatcher(credentialsMatcher());
         return realm;
     }
@@ -68,14 +64,29 @@ public class ShiroConfig {
     public SessionManager sessionManager() {
         CustomSessionManager sessionManager = new CustomSessionManager();
         sessionManager.setGlobalSessionTimeout(30*60*1000L);
+        sessionManager.setSessionDAO(sessionDao());
         return sessionManager;
     }
-
+    @Bean
+    public SessionDAO sessionDao(){
+        RedisSessionDAO sessionDAO = new RedisSessionDAO();
+        sessionDAO.setRedisManager(redisManager());
+        return sessionDAO;
+    }
     @Bean
     public RedisCacheManager redisCacheManager(){
         RedisCacheManager cacheManager = new RedisCacheManager();
+        cacheManager.setRedisManager(redisManager());
         cacheManager.setExpire(30*60*1000);
         return cacheManager;
+    }
+
+    @Bean
+    public RedisManager redisManager(){
+        RedisManager redisManager = new RedisManager();
+        redisManager.setHost("localhost");
+        redisManager.setPort(6379);
+        return redisManager;
     }
 
     /**

@@ -4,16 +4,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.scmc.entity.JsonData;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.cache.Cache;
 import org.apache.shiro.subject.Subject;
-import org.crazycake.shiro.RedisCacheManager;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import sun.security.krb5.internal.CredentialsUtil;
-
-import java.io.Serializable;
 
 @Controller
 @RequestMapping("pub")
@@ -26,7 +19,7 @@ public class LoginController {
             Subject subject = SecurityUtils.getSubject();
             UsernamePasswordToken token = new UsernamePasswordToken(username,password);
             subject.login(token);
-            subject.isAuthenticated();
+            boolean b = subject.isAuthenticated();
             String id = subject.getSession().getId().toString();
             JsonData jsonData = new JsonData(true, "/authc/index", id,"登录成功");
             return JSONObject.toJSONString(jsonData);
@@ -43,9 +36,11 @@ public class LoginController {
         return JSONObject.toJSONString(jsonData);
     }
 
-    @GetMapping("unauthc")
+    @GetMapping("unAuth")
     @ResponseBody
     public String uploadFile() {
-       return "访问失败，没有权限";
+        //告诉前端，没有权限
+        JsonData jsonData = new JsonData(false,null,null,"访问失败，没有权限");
+        return JSONObject.toJSONString(jsonData);
     }
 }
