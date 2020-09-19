@@ -5,14 +5,16 @@ import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
+import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.crazycake.shiro.RedisCacheManager;
 import org.crazycake.shiro.RedisManager;
 import org.crazycake.shiro.RedisSessionDAO;
+import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.context.annotation.Bean;
-
+import org.springframework.context.annotation.DependsOn;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -39,7 +41,7 @@ public class ShiroConfig {
         DefaultWebSecurityManager manager = new DefaultWebSecurityManager();
         manager.setRealm(customRealm());
         manager.setSessionManager(sessionManager());
-        manager.setCacheManager(redisCacheManager());
+        //manager.setCacheManager(redisCacheManager());
         return manager;
     }
 
@@ -61,12 +63,13 @@ public class ShiroConfig {
     }
 
     @Bean
-    public SessionManager sessionManager() {
-        CustomSessionManager sessionManager = new CustomSessionManager();
-        sessionManager.setGlobalSessionTimeout(30*60*1000L);
-        sessionManager.setSessionDAO(sessionDao());
-        return sessionManager;
+    public RedisManager redisManager(){
+        RedisManager redisManager = new RedisManager();
+        redisManager.setHost("localhost");
+        redisManager.setPort(6379);
+        return redisManager;
     }
+
     @Bean
     public SessionDAO sessionDao(){
         RedisSessionDAO sessionDAO = new RedisSessionDAO();
@@ -78,42 +81,24 @@ public class ShiroConfig {
         RedisCacheManager cacheManager = new RedisCacheManager();
         cacheManager.setRedisManager(redisManager());
         cacheManager.setExpire(30*60*1000);
+        cacheManager.setPrincipalIdFieldName("id");
         return cacheManager;
     }
 
     @Bean
-    public RedisManager redisManager(){
-        RedisManager redisManager = new RedisManager();
-        redisManager.setHost("localhost");
-        redisManager.setPort(6379);
-        return redisManager;
+    public SessionManager sessionManager() {
+        CustomSessionManager sessionManager = new CustomSessionManager();
+        sessionManager.setGlobalSessionTimeout(30*60*1000L);
+        sessionManager.setSessionDAO(sessionDao());
+        return sessionManager;
     }
-
-    /**
-     * 开启shiro 注解模式
-     * 可以在controller中的方法前加上注解
-     * 如 @RequiresPermissions("userInfo:add")
-     * @return
-     */
-   /* @Bean
-    public  LifecycleBeanPostProcessor lifecycleBeanPostProcessor() {
-        return new LifecycleBeanPostProcessor();
-    }
-
-    @Bean
-    @DependsOn("lifecycleBeanPostProcessor")
-    public  AuthorizationAttributeSourceAdvisor getDefaultAdvisorAutoProxyCreator(){
-        AuthorizationAttributeSourceAdvisor proxyCreator = new AuthorizationAttributeSourceAdvisor();
-        proxyCreator.setSecurityManager(securityManager());
-        return proxyCreator;
-    }*/
 
     private Map<String, String> getFilterChainMap() {
         Map<String, String> map = new LinkedHashMap<>();
         //退出过滤器
         map.put("/logout", "logout");
         //匿名过滤器,pub下的路径都不用验权
-        map.put("/pub", "anon");
+        //map.put("/pub", "anon");
         //登录才能访问的过滤器
         map.put("/authc/**", "authc");
         //管理员才能访问
@@ -124,4 +109,26 @@ public class ShiroConfig {
         map.put("**", "authc");
         return map;
     }
+    /**
+     * Shiro生命周期处理器
+     * @return
+     */
+    @Bean
+    public LifecycleBeanPostProcessor lifecycleBeanPostProcessor(){
+        return new LifecycleBeanPostProcessor();
+    }
+
+    /**
+     * 开启Shiro的注解(如@RequiresRoles,@RequiresPermissions),需借助SpringAOP扫描使用Shiro注解的类,并在必要时进行安全逻辑验证
+     * 配置以下两个bean(DefaultAdvisorAutoProxyCreator(可选)和AuthorizationAttributeSourceAdvisor)即可实现此功能
+     * @return
+     */
+    @Bean
+    @DependsOn({"lifecycleBeanPostProcessor"})
+    public DefaultAdvisorAutoProxyCreator advisorAutoProxyCreator(){
+        DefaultAdvisorAutoProxyCreator advisorAutoProxyCreator = new DefaultAdvisorAutoProxyCreator();
+        advisorAutoProxyCreator.setProxyTargetClass(true);
+        return advisorAutoProxyCreator;
+    }
+
 }
