@@ -2,7 +2,11 @@ package com.scmc.mapper;
 
 import com.scmc.entity.Role;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Component;
+
+import java.util.Set;
 
 /**
  * <p>
@@ -14,5 +18,6 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public interface RoleMapper extends BaseMapper<Role> {
-
+    @Select("select r.role_name from user u  left join user_role ur on u.id=ur.user_id left join role r on ur.role_id=r.id where u.username=#{username}")
+    public Set<String> getRolesByUsername(@Param("username")String username);
 }

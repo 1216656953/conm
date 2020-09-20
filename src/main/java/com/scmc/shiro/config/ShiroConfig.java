@@ -1,5 +1,6 @@
 package com.scmc.shiro.config;
 
+import com.scmc.shiro.filter.CustomPermissionAuthorizationFilter;
 import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.mgt.SecurityManager;
@@ -7,6 +8,7 @@ import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
+import org.apache.shiro.web.filter.authz.PermissionsAuthorizationFilter;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.crazycake.shiro.RedisCacheManager;
 import org.crazycake.shiro.RedisManager;
@@ -15,6 +17,9 @@ import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreato
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.DependsOn;
+
+import javax.servlet.Filter;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -32,7 +37,11 @@ public class ShiroConfig {
         shiroFilterFactoryBean.setSuccessUrl("/authc/success");
         shiroFilterFactoryBean.setUnauthorizedUrl("/pub/unAuth");
         shiroFilterFactoryBean.setSecurityManager(securityManager);
+        //自定义权限过滤器
         shiroFilterFactoryBean.setFilterChainDefinitionMap(getFilterChainMap());
+        HashMap<String, Filter> filterMap = new HashMap<>();
+        filterMap.put("perms",new CustomPermissionAuthorizationFilter());
+        shiroFilterFactoryBean.setFilters(filterMap);
         return shiroFilterFactoryBean;
     }
 
@@ -41,7 +50,7 @@ public class ShiroConfig {
         DefaultWebSecurityManager manager = new DefaultWebSecurityManager();
         manager.setRealm(customRealm());
         manager.setSessionManager(sessionManager());
-        //manager.setCacheManager(redisCacheManager());
+        manager.setCacheManager(redisCacheManager());
         return manager;
     }
 
@@ -98,13 +107,16 @@ public class ShiroConfig {
         //退出过滤器
         map.put("/logout", "logout");
         //匿名过滤器,pub下的路径都不用验权
-        //map.put("/pub", "anon");
+        map.put("/pub/**", "anon");
+        //对应路径需要具体的权限
+        map.put("/authc/add", "perms[conm:add,conm:view]");
+        map.put("/authc/view", "perms[conm:view]");
         //登录才能访问的过滤器
         map.put("/authc/**", "authc");
-        //管理员才能访问
+        //具有全部的角色才能访问管，角色之间用逗号隔开
         map.put("/admin/**", "roles[admin]");
         //具有合同查看权限才能访问
-        map.put("/conm/view", "perms[view]");;
+        map.put("/authc/view", "perms[view]");;
         //通过认证才能访问
         map.put("**", "authc");
         return map;

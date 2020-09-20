@@ -1,5 +1,6 @@
 package com.scmc.controller;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,5 +26,18 @@ public class IndexController {
     @ResponseBody
     public String bgcontrol() {
         return "控制台";
+    }
+
+    @PostMapping("view")
+    @ResponseBody
+    public String view() {
+        return "查看权限";
+    }
+
+    @RequiresPermissions("conm:add")
+    @PostMapping("add")
+    @ResponseBody
+    public String add() {
+        return "添加权限";
     }
 }

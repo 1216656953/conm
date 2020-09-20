@@ -17,6 +17,4 @@ import java.util.Set;
  */
 @Component
 public interface UserMapper extends BaseMapper<User> {
-    @Select("select r.role_name from user u  left join user_role ur on u.id=ur.user_id left join role r on ur.role_id=r.id where u.username=#{username}")
-    public Set<String> getRolesByUsername(@Param("username")String username);
 }

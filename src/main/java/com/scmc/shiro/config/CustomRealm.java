@@ -2,6 +2,8 @@ package com.scmc.shiro.config;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.scmc.entity.User;
+import com.scmc.mapper.PermissionMapper;
+import com.scmc.mapper.RoleMapper;
 import com.scmc.mapper.UserMapper;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -19,7 +21,11 @@ import java.util.Set;
 //自定义realm，基本逻辑都是根据用户名，自己去查找数据库，查出对应的权限，角色，密码
 public class CustomRealm extends AuthorizingRealm {
     @Autowired
+    private RoleMapper roleMapper;
+    @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private PermissionMapper permissionMapper;
     /**
      * 权限认证
      * @param principalCollection
@@ -37,13 +43,10 @@ public class CustomRealm extends AuthorizingRealm {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Set<String> rolesByUsername = userMapper.getRolesByUsername(user.getUsername());
-        Set<String> permissions = new HashSet<>();
-        permissions.add("conm:add");
-        permissions.add("conm:delete");
-        System.out.println("权限user");
+        Set<String> rolesByUsername = roleMapper.getRolesByUsername(user.getUsername());
+        Set<String> permissions = permissionMapper.getPermissionsByUsername(user.getUsername());
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
-        //info.setStringPermissions(permissions);
+        info.setStringPermissions(permissions);
         info.setRoles(rolesByUsername);
         return info;
     }
